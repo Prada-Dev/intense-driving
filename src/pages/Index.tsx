@@ -2,11 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Clock, Users, Shield, Phone, Mail, MapPin, Calendar, CheckCircle, Award } from "lucide-react";
+import { Star, Clock, Users, Shield, Phone, Mail, MapPin, Calendar, CheckCircle, Award, ArrowRight, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { BackgroundSlider } from "@/components/BackgroundSlider";
+import drivingCarImage from "@/assets/driving-car.jpg";
+import successStoryImage from "@/assets/success-story.jpg";
 
 const Index = () => {
   const courses = [
@@ -144,12 +146,148 @@ const Index = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                    Book This Course
-                  </Button>
+                  <div className="space-y-2">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Book This Course
+                    </Button>
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link to={
+                        course.title === "Beginner Course" ? "/courses/beginner" :
+                        course.title === "Intensive Course" ? "/courses/intensive" :
+                        "/courses"
+                      }>
+                        Learn More
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section with Images */}
+      <section className="py-20 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Intense Driving UK?</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              We combine professional instruction with modern techniques to help you become a confident, safe driver
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Professional Instruction</h3>
+              <p className="text-gray-700 mb-6">
+                Our qualified instructors use proven teaching methods and provide personalized guidance 
+                tailored to your learning style. With over 10 years of experience, we know what it takes 
+                to help you succeed.
+              </p>
+              <ul className="space-y-3">
+                <li className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  <span>DVSA approved instructors</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  <span>Dual-controlled vehicles</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  <span>Comprehensive progress tracking</span>
+                </li>
+              </ul>
+              <Button className="mt-6 bg-blue-600 hover:bg-blue-700" asChild>
+                <Link to="/about">
+                  Learn More About Us
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+            <div className="relative">
+              <img 
+                src={drivingCarImage} 
+                alt="Professional driving instruction"
+                className="rounded-lg shadow-xl"
+              />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-2 md:order-1 relative">
+              <img 
+                src={successStoryImage} 
+                alt="Student success stories"
+                className="rounded-lg shadow-xl"
+              />
+            </div>
+            <div className="order-1 md:order-2">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Proven Success Rate</h3>
+              <p className="text-gray-700 mb-6">
+                With a 95% first-time pass rate, our students consistently achieve their driving goals. 
+                We focus on building real-world skills and confidence that last a lifetime.
+              </p>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">2000+</div>
+                  <div className="text-sm text-gray-600">Students Taught</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">95%</div>
+                  <div className="text-sm text-gray-600">Pass Rate</div>
+                </div>
+              </div>
+              <Button className="bg-green-600 hover:bg-green-700" asChild>
+                <Link to="/courses">
+                  View Our Courses
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Links Section */}
+      <section className="py-16 bg-blue-50 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Popular Resources</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6 text-center">
+                <BookOpen className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-3">Theory Test Guide</h3>
+                <p className="text-gray-600 mb-4">Get comprehensive preparation for your theory test with our expert guidance.</p>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link to="/courses/theory-test">Learn More</Link>
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6 text-center">
+                <Calendar className="h-12 w-12 text-green-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-3">Intensive Courses</h3>
+                <p className="text-gray-600 mb-4">Fast-track your learning with our popular 5-day intensive program.</p>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link to="/courses/intensive">Learn More</Link>
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6 text-center">
+                <Users className="h-12 w-12 text-purple-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-3">FAQ</h3>
+                <p className="text-gray-600 mb-4">Find answers to common questions about our courses and services.</p>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link to="/faq">Learn More</Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

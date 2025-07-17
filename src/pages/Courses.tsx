@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Clock, Users, Star, Calendar } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 
@@ -190,8 +191,15 @@ const Courses = () => {
                       <Calendar className="mr-2 h-4 w-4" />
                       Book This Course
                     </Button>
-                    <Button variant="outline" className="w-full">
-                      Learn More
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link to={
+                        course.title === "Beginner Course" ? "/courses/beginner" :
+                        course.title === "Intensive Course" ? "/courses/intensive" :
+                        course.title === "Theory Test Preparation" ? "/courses/theory-test" :
+                        "/courses"
+                      }>
+                        Learn More
+                      </Link>
                     </Button>
                   </div>
                 </CardContent>

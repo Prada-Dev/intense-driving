@@ -13,6 +13,7 @@ export const Navigation = () => {
     { href: "/", label: "Home" },
     { href: "/courses", label: "Courses" },
     { href: "/about", label: "About Us" },
+    { href: "/faq", label: "FAQ" },
     { href: "/contact", label: "Contact" },
     { href: "/student-portal", label: "Student Portal" }
   ];

@@ -6,6 +6,7 @@ import { Star, Clock, Users, Shield, Phone, Mail, MapPin, Calendar, CheckCircle,
 import { Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { BackgroundSlider } from "@/components/BackgroundSlider";
 
 const Index = () => {
   const courses = [
@@ -68,8 +69,9 @@ const Index = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20 px-4">
-        <div className="container mx-auto max-w-6xl text-center">
+      <section className="relative text-white py-20 px-4 min-h-[600px] flex items-center">
+        <BackgroundSlider />
+        <div className="container mx-auto max-w-6xl text-center relative z-10">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
             Learn to Drive with
             <span className="block text-yellow-400">Intense Driving UK</span>

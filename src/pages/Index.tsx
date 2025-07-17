@@ -309,7 +309,7 @@ const Index = () => {
             <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold px-8 py-3">
               Book Your Lesson Now
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3">
+            <Button size="lg" variant="outline" className="border-white px-8 py-3 bg-blue-700 hover:bg-blue-600 text-slate-50">
               <Link to="/contact" className="flex items-center">
                 <Mail className="mr-2 h-5 w-5" />
                 Get in Touch

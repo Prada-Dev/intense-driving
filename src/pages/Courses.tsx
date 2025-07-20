@@ -118,12 +118,15 @@ const Courses = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16 px-4">
-        <div className="container mx-auto max-w-6xl text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Driving Courses</h1>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Professional driving instruction tailored to your needs and experience level
-          </p>
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero"></div>
+        <div className="relative z-10 text-white py-20 px-4">
+          <div className="container mx-auto max-w-6xl text-center animate-fade-in">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Driving Courses</h1>
+            <p className="text-xl text-white/90 max-w-3xl mx-auto">
+              Professional driving instruction tailored to your needs and experience level
+            </p>
+          </div>
         </div>
       </section>
 

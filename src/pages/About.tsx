@@ -52,12 +52,15 @@ const About = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16 px-4">
-        <div className="container mx-auto max-w-6xl text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">About Intense Driving UK</h1>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Manchester's premier driving school with over a decade of experience in creating confident, safe drivers
-          </p>
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero"></div>
+        <div className="relative z-10 text-white py-20 px-4">
+          <div className="container mx-auto max-w-6xl text-center animate-fade-in">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">About Intense Driving UK</h1>
+            <p className="text-xl text-white/90 max-w-3xl mx-auto">
+              Manchester's premier driving school with over a decade of experience in creating confident, safe drivers
+            </p>
+          </div>
         </div>
       </section>
 
@@ -179,17 +182,17 @@ const About = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600 text-white px-4">
-        <div className="container mx-auto max-w-4xl text-center">
+      <section className="py-16 bg-gradient-primary text-white px-4">
+        <div className="container mx-auto max-w-4xl text-center animate-fade-in">
           <h2 className="text-3xl font-bold mb-4">Ready to Learn with the Best?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-white/90 mb-8">
             Join the thousands of students who've trusted us with their driving education
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold px-8 py-3">
+            <Button size="lg" className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-gray-900 font-bold px-8 py-3 transform hover:scale-105 transition-all duration-300">
               Book Your First Lesson
             </Button>
-            <Button size="lg" variant="outline" className="border-white px-8 py-3 text-slate-50 bg-blue-700 hover:bg-blue-600">
+            <Button size="lg" variant="outline" className="border-white/30 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm px-8 py-3">
               <Phone className="mr-2 h-5 w-5" />
               Call Us Today
             </Button>

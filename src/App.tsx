@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +9,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import StudentPortal from "./pages/StudentPortal";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/AdminDashboard";
 import BeginnerCourse from "./pages/BeginnerCourse";
 import IntensiveCourse from "./pages/IntensiveCourse";
 import TheoryTest from "./pages/TheoryTest";
@@ -29,6 +29,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/student-portal" element={<StudentPortal />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/courses/beginner" element={<BeginnerCourse />} />
           <Route path="/courses/intensive" element={<IntensiveCourse />} />
           <Route path="/courses/theory-test" element={<TheoryTest />} />

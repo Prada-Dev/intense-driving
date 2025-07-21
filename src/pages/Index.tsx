@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { BookingForm } from "@/components/BookingForm";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { PricingCard } from "@/components/PricingCard";
+import { SuccessCarousel } from "@/components/SuccessCarousel";
 import drivingCarImage from "@/assets/driving-car.jpg";
 import successStoryImage from "@/assets/success-story.jpg";
 const Index = () => {
@@ -498,6 +499,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Success Stories Carousel */}
+      <SuccessCarousel />
 
       <Footer />
     </div>;

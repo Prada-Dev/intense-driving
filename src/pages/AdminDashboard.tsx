@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,22 @@ const AdminDashboard = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
+  const [courses, setCourses] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    setLoading(true);
+    const fetchData = async () => {
+      const { data: coursesData } = await supabase.from("courses").select("*");
+      const { data: bookingsData } = await supabase.from("bookings").select("*, course_id(*), student_id(*)").order("created_at", { ascending: false });
+      setCourses(coursesData || []);
+      setBookings(bookingsData || []);
+      setLoading(false);
+    };
+    fetchData();
+  }, [isAdmin]);
 
   // Admin login handler
   const handleLogin = async () => {
@@ -146,7 +162,7 @@ const AdminDashboard = () => {
                     <CardTitle>Total Bookings</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="default">123</Badge>
+                    <Badge variant="default">{bookings.length}</Badge>
                   </CardContent>
                 </Card>
                 <Card>
@@ -154,7 +170,7 @@ const AdminDashboard = () => {
                     <CardTitle>Pending Bookings</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="secondary">7</Badge>
+                    <Badge variant="secondary">{bookings.filter(b => b.status === "pending").length}</Badge>
                   </CardContent>
                 </Card>
                 <Card>
@@ -162,7 +178,7 @@ const AdminDashboard = () => {
                     <CardTitle>Courses</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="default">5</Badge>
+                    <Badge variant="default">{courses.length}</Badge>
                   </CardContent>
                 </Card>
                 <Card>
@@ -170,25 +186,66 @@ const AdminDashboard = () => {
                     <CardTitle>Manual Follow-up</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="destructive">2</Badge>
+                    <Badge variant="destructive">{bookings.filter(b => b.status === "manual").length}</Badge>
                   </CardContent>
                 </Card>
               </div>
-              {/* Recent Bookings List (placeholder) */}
+              {/* Recent Bookings List */}
               <Card className="mt-8">
                 <CardHeader>
                   <CardTitle>Recent Bookings</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    <li className="flex justify-between items-center">
-                      <span>Sarah Johnson - Beginner Course</span>
-                      <Badge variant="default">Confirmed</Badge>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <span>Michael Lee - Intensive Course</span>
-                      <Badge variant="secondary">Pending</Badge>
-                    </li>
+                    {bookings.slice(0, 5).map((b, i) => (
+                      <li key={b.id || i} className="flex justify-between items-center">
+                        <span>{b.student_id?.name || b.student_id || "Unknown"} - {b.course_id?.title || b.course_id || "Unknown Course"}</span>
+                        <Badge variant={b.status === "confirmed" ? "default" : b.status === "pending" ? "secondary" : "outline"}>{b.status}</Badge>
+                      </li>
+                    ))}
+                    {bookings.length === 0 && <li>No bookings found.</li>}
+                  </ul>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="courses" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Courses</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {courses.map((c) => (
+                      <li key={c.id} className="flex justify-between items-center">
+                        <span>{c.title} - £{c.price} ({c.duration})</span>
+                        <Badge variant={c.is_active ? "default" : "secondary"}>{c.is_active ? "Active" : "Inactive"}</Badge>
+                      </li>
+                    ))}
+                    {courses.length === 0 && <li>No courses found.</li>}
+                  </ul>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="bookings" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Bookings</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {bookings.map((b) => (
+                      <li key={b.id} className="flex flex-col md:flex-row md:justify-between md:items-center border-b pb-2">
+                        <div>
+                          <span className="font-semibold">{b.student_id?.name || b.student_id || "Unknown"}</span> booked <span className="font-semibold">{b.course_id?.title || b.course_id || "Unknown Course"}</span>
+                          <span className="ml-2 text-xs text-gray-500">({b.preferred_date})</span>
+                        </div>
+                        <div className="flex gap-2 mt-2 md:mt-0">
+                          <Badge variant={b.status === "confirmed" ? "default" : b.status === "pending" ? "secondary" : "outline"}>{b.status}</Badge>
+                          <Badge variant={b.payment_status === "paid" ? "default" : "secondary"}>{b.payment_status}</Badge>
+                        </div>
+                      </li>
+                    ))}
+                    {bookings.length === 0 && <li>No bookings found.</li>}
                   </ul>
                 </CardContent>
               </Card>

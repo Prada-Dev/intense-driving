@@ -16,6 +16,8 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
   // Helper function to check if user has admin role
   const checkAdminRole = async (userId: string): Promise<boolean> => {
     try {
+      console.log("Checking admin role for user:", userId);
+      
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("role")
@@ -27,7 +29,11 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
         return false;
       }
 
-      return profileData?.role === "admin";
+      console.log("Profile data:", profileData);
+      const isAdmin = profileData?.role === "admin";
+      console.log("Is admin:", isAdmin);
+      
+      return isAdmin;
     } catch (error) {
       console.error("Error checking admin role:", error);
       return false;
@@ -37,27 +43,35 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
   // Login function
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log("Attempting login for:", email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error("Auth error:", error);
         return { success: false, error: error.message };
       }
 
       const user = data?.user;
+      console.log("User authenticated:", user?.id);
+      
       if (user) {
         const isAdminUser = await checkAdminRole(user.id);
         
         if (isAdminUser) {
+          console.log("Admin access granted");
           setIsAdmin(true);
           return { success: true };
         } else {
+          console.log("Admin access denied - user role is not admin");
           await supabase.auth.signOut();
           return { success: false, error: "You do not have admin privileges. Please contact an administrator." };
         }
       } else {
+        console.log("No user found after authentication");
         await supabase.auth.signOut();
         return { success: false, error: "User not found." };
       }

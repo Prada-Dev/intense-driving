@@ -15,6 +15,7 @@ import DateRangePicker from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { AdminAuthDebug } from "@/components/AdminAuthDebug";
 
 const AdminDashboard = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -126,53 +127,63 @@ const AdminDashboard = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <section className="py-20 px-4 min-h-screen flex items-center">
-          <div className="container mx-auto max-w-md">
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl flex items-center justify-center gap-2">
-                  <Shield className="h-5 w-5 text-blue-600" /> Admin Login
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter admin email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? "Hide" : "Show"}
+        <section className="py-20 px-4 min-h-screen">
+          <div className="container mx-auto max-w-4xl">
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Login Form */}
+              <div>
+                <Card>
+                  <CardHeader className="text-center">
+                    <CardTitle className="text-2xl flex items-center justify-center gap-2">
+                      <Shield className="h-5 w-5 text-blue-600" /> Admin Login
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="Enter admin email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <div className="relative">
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? "Hide" : "Show"}
+                          </Button>
+                        </div>
+                      </div>
+                      <Button onClick={handleLogin} className="w-full">
+                        <LogIn className="mr-2 h-4 w-4" /> Login
                       </Button>
                     </div>
-                  </div>
-                  <Button onClick={handleLogin} className="w-full">
-                    <LogIn className="mr-2 h-4 w-4" /> Login
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Debug Component */}
+              <div>
+                <AdminAuthDebug />
+              </div>
+            </div>
           </div>
         </section>
         <Footer />

@@ -6,13 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { LogIn, LogOut, Shield } from "lucide-react";
+import { LogIn, LogOut, Shield, MapPin, Calendar, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import Map from "@/components/Map";
+import DateRangePicker from "@/components/DateRangePicker";
+import { DateRange } from "react-day-picker";
+import { format, subDays, startOfDay, endOfDay } from "date-fns";
+import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { AdminAuthDebug } from "@/components/AdminAuthDebug";
 
 const AdminDashboard = () => {
-  const [isAdmin, setIsAdmin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,6 +25,14 @@ const AdminDashboard = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  });
+  const [filteredBookings, setFilteredBookings] = useState<any[]>([]);
+  
+  // Use the custom admin auth hook
+  const { isAdmin, isLoading: authLoading, login, logout } = useAdminAuth();
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -34,42 +47,54 @@ const AdminDashboard = () => {
     fetchData();
   }, [isAdmin]);
 
-  // Admin login handler
-  const handleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      toast({
-        title: "Login failed",
-        description: error.message,
-        variant: "destructive",
-      });
+  // Filter bookings based on date range
+  useEffect(() => {
+    if (!dateRange?.from || !dateRange?.to) {
+      setFilteredBookings(bookings);
       return;
     }
-    // Check is_admin flag in user_metadata
-    const user = data?.user;
-    if (user?.user_metadata?.is_admin) {
-      setIsAdmin(true);
+
+    const filtered = bookings.filter((booking) => {
+      const bookingDate = new Date(booking.created_at);
+      return bookingDate >= startOfDay(dateRange.from!) && bookingDate <= endOfDay(dateRange.to!);
+    });
+    setFilteredBookings(filtered);
+  }, [bookings, dateRange]);
+
+  // Generate map markers from bookings
+  const generateMapMarkers = () => {
+    // Sample locations - in a real app, you'd get these from your data
+    const sampleLocations = [
+      { id: "1", position: [51.505, -0.09] as [number, number], title: "London Office", description: "Main training center" },
+      { id: "2", position: [51.507, -0.12] as [number, number], title: "Westminster Branch", description: "Secondary location" },
+      { id: "3", position: [51.503, -0.08] as [number, number], title: "City Branch", description: "Financial district office" },
+    ];
+    return sampleLocations;
+  };
+
+  // Admin login handler
+  const handleLogin = async () => {
+    const result = await login(email, password);
+    
+    if (result.success) {
       toast({
         title: "Admin Access Granted",
         description: "Welcome to the admin dashboard.",
       });
+      setEmail("");
+      setPassword("");
     } else {
       toast({
-        title: "Access Denied",
-        description: "You do not have admin privileges.",
+        title: "Login failed",
+        description: result.error || "An error occurred during login.",
         variant: "destructive",
       });
-      await supabase.auth.signOut();
     }
   };
 
   // Logout handler
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setIsAdmin(false);
+    await logout();
     setEmail("");
     setPassword("");
     toast({
@@ -78,57 +103,87 @@ const AdminDashboard = () => {
     });
   };
 
-  if (!isAdmin) {
+  // Show loading state while checking authentication
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
         <section className="py-20 px-4 min-h-screen flex items-center">
           <div className="container mx-auto max-w-md">
             <Card>
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl flex items-center justify-center gap-2">
-                  <Shield className="h-5 w-5 text-blue-600" /> Admin Login
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter admin email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? "Hide" : "Show"}
-                      </Button>
-                    </div>
-                  </div>
-                  <Button onClick={handleLogin} className="w-full">
-                    <LogIn className="mr-2 h-4 w-4" /> Login
-                  </Button>
-                </div>
+              <CardContent className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Checking authentication...</p>
               </CardContent>
             </Card>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <section className="py-20 px-4 min-h-screen">
+          <div className="container mx-auto max-w-4xl">
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Login Form */}
+              <div>
+                <Card>
+                  <CardHeader className="text-center">
+                    <CardTitle className="text-2xl flex items-center justify-center gap-2">
+                      <Shield className="h-5 w-5 text-blue-600" /> Admin Login
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="Enter admin email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <div className="relative">
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? "Hide" : "Show"}
+                          </Button>
+                        </div>
+                      </div>
+                      <Button onClick={handleLogin} className="w-full">
+                        <LogIn className="mr-2 h-4 w-4" /> Login
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Debug Component */}
+              <div>
+                <AdminAuthDebug />
+              </div>
+            </div>
           </div>
         </section>
         <Footer />
@@ -149,20 +204,46 @@ const AdminDashboard = () => {
             </Button>
           </div>
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="courses">Courses</TabsTrigger>
               <TabsTrigger value="bookings">Bookings</TabsTrigger>
-              <TabsTrigger value="students">Students</TabsTrigger>
+              <TabsTrigger value="map">Map</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="space-y-6">
+              {/* Date Range Filter */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Filter className="h-5 w-5" />
+                    Filter by Date Range
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="max-w-md">
+                    <DateRangePicker
+                      dateRange={dateRange}
+                      onDateRangeChange={setDateRange}
+                      placeholder="Filter bookings by date range"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
               <div className="grid md:grid-cols-4 gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Total Bookings</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="default">{bookings.length}</Badge>
+                    <Badge variant="default">{filteredBookings.length}</Badge>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {dateRange?.from && dateRange?.to 
+                        ? `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd')}`
+                        : 'All time'
+                      }
+                    </p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -170,7 +251,7 @@ const AdminDashboard = () => {
                     <CardTitle>Pending Bookings</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="secondary">{bookings.filter(b => b.status === "pending").length}</Badge>
+                    <Badge variant="secondary">{filteredBookings.filter(b => b.status === "pending").length}</Badge>
                   </CardContent>
                 </Card>
                 <Card>
@@ -186,7 +267,7 @@ const AdminDashboard = () => {
                     <CardTitle>Manual Follow-up</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="destructive">{bookings.filter(b => b.status === "manual").length}</Badge>
+                    <Badge variant="destructive">{filteredBookings.filter(b => b.status === "manual").length}</Badge>
                   </CardContent>
                 </Card>
               </div>
@@ -197,13 +278,18 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {bookings.slice(0, 5).map((b, i) => (
+                    {filteredBookings.slice(0, 5).map((b, i) => (
                       <li key={b.id || i} className="flex justify-between items-center">
                         <span>{b.student_id?.name || b.student_id || "Unknown"} - {b.course_id?.title || b.course_id || "Unknown Course"}</span>
-                        <Badge variant={b.status === "confirmed" ? "default" : b.status === "pending" ? "secondary" : "outline"}>{b.status}</Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={b.status === "confirmed" ? "default" : b.status === "pending" ? "secondary" : "outline"}>{b.status}</Badge>
+                          <span className="text-xs text-gray-500">
+                            {b.created_at ? format(new Date(b.created_at), 'MMM dd, yyyy') : 'N/A'}
+                          </span>
+                        </div>
                       </li>
                     ))}
-                    {bookings.length === 0 && <li>No bookings found.</li>}
+                    {filteredBookings.length === 0 && <li>No bookings found for selected date range.</li>}
                   </ul>
                 </CardContent>
               </Card>
@@ -233,7 +319,7 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {bookings.map((b) => (
+                    {filteredBookings.map((b) => (
                       <li key={b.id} className="flex flex-col md:flex-row md:justify-between md:items-center border-b pb-2">
                         <div>
                           <span className="font-semibold">{b.student_id?.name || b.student_id || "Unknown"}</span> booked <span className="font-semibold">{b.course_id?.title || b.course_id || "Unknown Course"}</span>
@@ -245,12 +331,103 @@ const AdminDashboard = () => {
                         </div>
                       </li>
                     ))}
-                    {bookings.length === 0 && <li>No bookings found.</li>}
+                    {filteredBookings.length === 0 && <li>No bookings found for selected date range.</li>}
                   </ul>
                 </CardContent>
               </Card>
             </TabsContent>
-            {/* Other tabs will be implemented next */}
+
+            <TabsContent value="map" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    Training Locations Map
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Map 
+                    center={[51.505, -0.09]}
+                    zoom={12}
+                    markers={generateMapMarkers()}
+                    height="500px"
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="analytics" className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Booking Trends
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span>This Week</span>
+                        <Badge variant="default">
+                          {filteredBookings.filter(b => {
+                            const bookingDate = new Date(b.created_at);
+                            const weekAgo = subDays(new Date(), 7);
+                            return bookingDate >= weekAgo;
+                          }).length}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>This Month</span>
+                        <Badge variant="default">
+                          {filteredBookings.filter(b => {
+                            const bookingDate = new Date(b.created_at);
+                            const monthAgo = subDays(new Date(), 30);
+                            return bookingDate >= monthAgo;
+                          }).length}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Total Revenue</span>
+                        <Badge variant="default">
+                          £{filteredBookings.reduce((total, b) => {
+                            return total + (b.course_id?.price || 0);
+                          }, 0).toLocaleString()}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Status Distribution</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span>Confirmed</span>
+                        <Badge variant="default">
+                          {filteredBookings.filter(b => b.status === "confirmed").length}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Pending</span>
+                        <Badge variant="secondary">
+                          {filteredBookings.filter(b => b.status === "pending").length}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Manual Follow-up</span>
+                        <Badge variant="destructive">
+                          {filteredBookings.filter(b => b.status === "manual").length}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
           </Tabs>
         </div>
       </section>

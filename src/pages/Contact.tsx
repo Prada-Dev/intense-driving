@@ -39,19 +39,19 @@ const Contact = () => {
     {
       icon: Phone,
       title: "Phone",
-      details: ["+44 20 7123 4567", "+44 7890 123456 (Mobile)"],
+      details: ["+44 7450 043930"],
       action: "Call Now"
     },
     {
       icon: Mail,
       title: "Email",
-      details: ["info@intensedrivinguk.com", "bookings@intensedrivinguk.com"],
+      details: ["info@intensedrivinguk.com", "support@intensedrivinguk.com"],
       action: "Send Email"
     },
     {
       icon: MapPin,
       title: "Address",
-      details: ["123 London Road", "Manchester, M1 2AB", "United Kingdom"],
+      details: ["77 Cotefield Rd", "Wythenshawe", "Manchester M22 1UY", "United Kingdom"],
       action: "Get Directions"
     },
     {
@@ -200,7 +200,7 @@ const Contact = () => {
                   <div className="text-center text-gray-500">
                     <MapPin className="h-12 w-12 mx-auto mb-2" />
                     <p>Interactive Map</p>
-                    <p className="text-sm">123 London Road, Manchester M1 2AB</p>
+                    <p className="text-sm">77 Cotefield Rd, Wythenshawe, Manchester M22 1UY</p>
                   </div>
                 </div>
               </Card>
@@ -218,7 +218,7 @@ const Contact = () => {
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
                     <Phone className="mr-2 h-4 w-4" />
-                    Call Now: +44 20 7123 4567
+                    Call Now: +44 7450 043930
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
                     <Mail className="mr-2 h-4 w-4" />
@@ -239,7 +239,7 @@ const Contact = () => {
                   <p className="text-sm text-orange-700 mb-2">
                     If you need to cancel or reschedule a lesson on short notice:
                   </p>
-                  <p className="font-semibold text-orange-800">+44 7890 123456</p>
+                  <p className="font-semibold text-orange-800">+44 7450 043930</p>
                   <p className="text-xs text-orange-600 mt-1">Available during lesson hours</p>
                 </CardContent>
               </Card>

@@ -60,7 +60,7 @@ export const Footer = () => {
             <div className="space-y-3 text-sm">
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-blue-400" />
-                <span className="text-gray-400">+44 20 7123 4567</span>
+                <span className="text-gray-400">+44 7450 043930</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-blue-400" />
@@ -68,7 +68,7 @@ export const Footer = () => {
               </div>
               <div className="flex items-start space-x-2">
                 <MapPin className="h-4 w-4 text-blue-400 mt-0.5" />
-                <span className="text-gray-400">123 London Road<br />Manchester, M1 2AB</span>
+                <span className="text-gray-400">77 Cotefield Rd<br />Wythenshawe, Manchester M22 1UY</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Clock className="h-4 w-4 text-blue-400" />

@@ -14,9 +14,9 @@ import Map from "@/components/Map";
 import DateRangePicker from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
+import { useAdminAuth } from "@/hooks/use-admin-auth";
 
 const AdminDashboard = () => {
-  const [isAdmin, setIsAdmin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +29,9 @@ const AdminDashboard = () => {
     to: new Date(),
   });
   const [filteredBookings, setFilteredBookings] = useState<any[]>([]);
+  
+  // Use the custom admin auth hook
+  const { isAdmin, isLoading: authLoading, login, logout } = useAdminAuth();
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -70,40 +73,27 @@ const AdminDashboard = () => {
 
   // Admin login handler
   const handleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      toast({
-        title: "Login failed",
-        description: error.message,
-        variant: "destructive",
-      });
-      return;
-    }
-    // Check is_admin flag in user_metadata
-    const user = data?.user;
-    if (user?.user_metadata?.is_admin) {
-      setIsAdmin(true);
+    const result = await login(email, password);
+    
+    if (result.success) {
       toast({
         title: "Admin Access Granted",
         description: "Welcome to the admin dashboard.",
       });
+      setEmail("");
+      setPassword("");
     } else {
       toast({
-        title: "Access Denied",
-        description: "You do not have admin privileges.",
+        title: "Login failed",
+        description: result.error || "An error occurred during login.",
         variant: "destructive",
       });
-      await supabase.auth.signOut();
     }
   };
 
   // Logout handler
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setIsAdmin(false);
+    await logout();
     setEmail("");
     setPassword("");
     toast({
@@ -111,6 +101,26 @@ const AdminDashboard = () => {
       description: "You have been logged out.",
     });
   };
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <section className="py-20 px-4 min-h-screen flex items-center">
+          <div className="container mx-auto max-w-md">
+            <Card>
+              <CardContent className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Checking authentication...</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     return (

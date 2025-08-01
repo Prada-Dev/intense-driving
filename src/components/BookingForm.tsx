@@ -15,9 +15,11 @@ import { useToast } from "@/hooks/use-toast";
 interface Course {
   id: string;
   title: string;
-  price: number;
+  price: string;
   duration: string;
-  location: string;
+  level: string;
+  features: string[];
+  includes: string;
 }
 
 export const BookingForm = () => {
@@ -36,27 +38,92 @@ export const BookingForm = () => {
   });
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      const { data, error } = await (supabase as any)
-        .from("courses")
-        .select("id, title, price, duration, location")
-        .eq("is_active", true)
-        .order("title");
-      
-      if (error) {
-        console.error("Error fetching courses:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load courses. Please refresh the page.",
-          variant: "destructive",
-        });
-      } else {
-        setCourses(data || []);
+    // Use hardcoded courses instead of fetching from database
+    const hardcodedCourses = [
+      {
+        id: "beginner",
+        title: "Beginner Course",
+        price: "£30",
+        duration: "2 hours per lesson",
+        level: "Beginner",
+        features: [
+          "Basic vehicle controls and safety checks",
+          "Understanding traffic rules and road signs",
+          "Parking and maneuvering techniques",
+          "Building confidence on quiet roads",
+          "Theory test preparation included",
+          "Flexible scheduling options"
+        ],
+        includes: "Theory materials, practice tests, progress tracking"
+      },
+      {
+        id: "intensive",
+        title: "Intensive Course",
+        price: "£250",
+        duration: "5 days (10 hours total)",
+        level: "All levels",
+        features: [
+          "Daily 2-hour intensive lessons",
+          "Comprehensive theory test preparation",
+          "Mock driving test sessions",
+          "Fast-track practical test booking",
+          "One-on-one personalized instruction",
+          "Weekend availability"
+        ],
+        includes: "All materials, mock tests, test booking assistance"
+      },
+      {
+        id: "refresher",
+        title: "Refresher Course",
+        price: "£35",
+        duration: "Flexible timing",
+        level: "Intermediate",
+        features: [
+          "Confidence building exercises",
+          "Updated road rules and regulations",
+          "Practical skills assessment",
+          "Customized lesson plans",
+          "Flexible scheduling to fit your needs",
+          "Highway and city driving practice"
+        ],
+        includes: "Skills assessment, personalized plan, progress tracking"
+      },
+      {
+        id: "theory",
+        title: "Theory Test Preparation",
+        price: "£20",
+        duration: "2 hours",
+        level: "All levels",
+        features: [
+          "Latest Highway Code coverage",
+          "Interactive hazard perception training",
+          "Multiple mock theory tests",
+          "Personalized weak area focus",
+          "Online practice access",
+          "Test booking guidance"
+        ],
+        includes: "Study materials, online access, mock tests"
+      },
+      {
+        id: "passplus",
+        title: "Pass Plus Course",
+        price: "£45",
+        duration: "6 hours (3 x 2 hour lessons)",
+        level: "Advanced",
+        features: [
+          "Motorway driving skills",
+          "Night driving techniques",
+          "Adverse weather conditions",
+          "Dual carriageway navigation",
+          "Urban and rural driving",
+          "Insurance discount eligibility"
+        ],
+        includes: "Official Pass Plus certificate, insurance benefits guide"
       }
-    };
-
-    fetchCourses();
-  }, [toast]);
+    ];
+    
+    setCourses(hardcodedCourses);
+  }, []);
 
   const generateBookingId = () => {
     const randomNumbers = Math.floor(Math.random() * 900000) + 100000;
@@ -78,26 +145,10 @@ export const BookingForm = () => {
     setLoading(true);
     
     try {
-      // Create temporary student record (we'll improve this later)
-      const tempStudentId = crypto.randomUUID();
+      // Simulate booking submission since database is not set up
+      // In a real application, this would submit to the database
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
       
-      const { data: booking, error } = await (supabase as any)
-        .from("bookings")
-        .insert([
-          {
-            student_id: tempStudentId,
-            course_id: formData.course_id,
-            preferred_date: formData.preferred_date.toISOString().split('T')[0],
-            notes: `Name: ${formData.name}, Phone: ${formData.phone}, Postcode: ${formData.postcode}`,
-            status: "pending",
-            payment_status: "unpaid"
-          }
-        ])
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-
       const newBookingId = generateBookingId();
       setBookingId(newBookingId);
       setSuccess(true);
@@ -139,6 +190,19 @@ export const BookingForm = () => {
           <p className="text-sm text-gray-500 mb-6">
             We'll contact you within 24 hours to confirm your lesson details and payment instructions.
           </p>
+          
+          {/* Bank Details */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h4 className="font-semibold text-blue-900 mb-3">Bank Transfer Details</h4>
+            <div className="text-sm text-blue-800 space-y-1">
+              <div><strong>Country:</strong> Luxembourg</div>
+              <div><strong>Account Name:</strong> RENE NDANJI NGU</div>
+              <div><strong>Bank Name:</strong> Financial House Ltd</div>
+              <div><strong>Account Number:</strong> 163750063</div>
+              <div><strong>IBAN:</strong> GB49FNH000993616375036</div>
+              <div><strong>BIC / SWIFT:</strong> FNHOGB21XXX</div>
+            </div>
+          </div>
           <Button 
             onClick={() => {
               setSuccess(false);
@@ -229,7 +293,7 @@ export const BookingForm = () => {
               <SelectContent>
                 {courses.map((course) => (
                   <SelectItem key={course.id} value={course.id}>
-                    {course.title} - £{course.price} ({course.duration})
+                    {course.title} - {course.price} ({course.duration})
                   </SelectItem>
                 ))}
               </SelectContent>
